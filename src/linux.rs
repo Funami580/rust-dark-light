@@ -49,3 +49,21 @@ pub fn detect() -> crate::Mode {
         crate::Mode::Light
     }
 }
+
+pub fn watch() -> crate::Mode {
+    let handle = std::thread::spawn(|| {
+        loop {
+            let mode = detect();
+            println!("Current mode: {:?}", mode);
+            loop {
+                return if detect() != mode {
+                    println!("New mode: {:?}", detect());
+                    detect()
+                } else {
+                    mode
+                }
+            }
+        }
+    });
+    handle.join().unwrap()
+}
