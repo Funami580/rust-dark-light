@@ -45,3 +45,22 @@ pub enum Mode {
 pub fn detect() -> Mode {
     platform::detect()
 }
+
+/// Watch if light mode or dark mode and return as soon as it changes.
+pub fn watch() -> crate::Mode {
+    let handle = std::thread::spawn(|| {
+        loop {
+            let mode = detect();
+            println!("Current mode: {:?}", mode);
+            loop {
+                return if detect() != mode {
+                    println!("New mode: {:?}", detect());
+                    detect()
+                } else {
+                    mode
+                }
+            }
+        }
+    });
+    handle.join().unwrap()
+}
